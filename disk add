@@ -1,0 +1,8 @@
+echo 1 |sudo tee /sys/class/block/sda/device/rescan
+
+lsblk -l
+sudo growpart /dev/sda 32075  sudo pvresize /dev/sda3
+vgdisplay ubuntu-vg
+lvextend -l +100%FREE /dev/ubuntu-vg/ubuntu-lv
+resize2fs /dev/ubuntu-vg/ubuntu-lv
+df -Th
