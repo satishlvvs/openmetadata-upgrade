@@ -1,0 +1,29 @@
+pg_dump -h localhost -U postgres -p 5444 -d airflow_db >airflow_db_v1.5.2_20250427.sql
+ 1418  ls -lrt
+ 1419  pg_dump -h localhost -U postgres -p 5444 -d openmetadata_db  > openmetadata_db_v1.5.2_20250427.sql
+  clear
+ 1455  docker compose -f /opendata/openmetadata-docker-pg-1.4.0/docker-compose-postgres-1.4.0.yml down
+
+docker compose -f /opendata/openmetadata-docker-pg-1.9.2/docker-compose-postgres.yml up -d 
+docker compose -f /opendata/openmetadata-docker-pg-1.9.2/docker-compose-postgres.yml stop
+docker ps -a
+docker start openmetadata_postgresql
+psql -h localhost -p 5444 -U postgres -c "\l"
+psql -h localhost -p 5444 -U postgres -c "\l+"
+psql -h localhost -p 5444 -U postgres -c "create database airflow_db_n with owner airflow_user"
+psql -h localhost -p 5444 -U postgres -c "create database openmetadata_db_n with owner openmetadata_user"
+psql -h localhost -p 5444 -U postgres -c "\l"
+psql  -h localhost -U postgres -p 5444 -d airflow_db_n -f /opendata/openmetadata-docker-pg-1.7.0/airflow_db_v1.7.0_20250825.sql 1>/opendata/openmetadata-docker-pg-1.9.2/air_sucess_20250825.log 2>/opendata/openmetadata-docker-pg-1.9.2/air_error_20250825.log
+psql  -h localhost -U postgres -p 5444 -d openmetadata_db_n -f /opendata/openmetadata-docker-pg-1.7.0/openmetadata_db_v1.7.0_20250825.sql 1>/opendata/openmetadata-docker-pg-1.9.2/open_sucess_20250825.log 2>/opendata/openmetadata-docker-pg-1.9.2/open_error_20250825.log
+psql  -h localhost -U postgres -p 5444 -c "alter database airflow_db rename to airflow_db_old"
+psql  -h localhost -U postgres -p 5444 -c "alter database openmetadata_db rename to openmetadata_db_old"
+psql  -h localhost -U postgres -p 5444 -c "alter database airflow_db_n rename to airflow_db"
+psql  -h localhost -U postgres -p 5444 -c "alter database openmetadata_db_n rename to openmetadata_db"
+psql -h localhost -p 5444 -U postgres -c "\l+"
+docker stop openmetadata_postgresql
+docker compose -f /opendata/openmetadata-docker-pg-1.9.2/docker-compose-postgres.yml start
+docker ps
+systemctl status nginx.service
+systemctl start nginx.service
+systemctl status nginx.service
+df -h
